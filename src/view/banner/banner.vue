@@ -23,12 +23,6 @@
                 >
                 <template slot-scope="scope">
                     <el-button
-                    @click.native.prevent="deleteRow(scope.$index, scope.row)"
-                    size="mini"
-                    type="danger">
-                    移除
-                    </el-button>
-                    <el-button
                     @click.native.prevent="changeStatus(scope.$index, scope.row)"
                     size="mini"
                     type="primary">
@@ -43,47 +37,19 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-dialog
-            title="修改"
-            :visible.sync="dialogVisible"
-            width="50%"
-            :before-close="handleClose">
-            <el-form ref="form" :model="form" label-width="80px">
-                <el-form-item label="图片选择">
-                    <a class="btn" @click="toggleShow">设置头像</a>
-                    <my-upload field="img"
-                        @imagechanged="change"
-                        @crop-success="cropSuccess"
-                        @crop-upload-success="cropUploadSuccess"
-                        @crop-upload-fail="cropUploadFail"
-                        v-model="show"
-                        :width="240"
-                        :height="120"
-                        url="http://47.93.51.252/upload/alioss/getOssToken"
-                        :headers="headers"
-                        :id="id"
-                        img-format="png"></my-upload>
-                </el-form-item>
-                <el-form-item label="跳转链接">
-                    <el-input v-model="form.jump"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="onSubmit">立即创建</el-button>
-                    <el-button>取消</el-button>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-            </span>
-        </el-dialog>
+        <!-- 编辑 -->
+        <Edit ref="edit" @getList="getBanner"></Edit>
+        <Create ref="create" @getList="getBanner"></Create>
+        <!-- 新建 -->
         <el-pagination
             background
             layout="prev, pager, next"
-            :total="1000">
+            :total="bannerTotal"
+            :page-size="limit"
+            @current-change="currentChange">
         </el-pagination>
         <div class="bottom">
-            <el-button type="primary">添加</el-button>
+            <el-button type="primary" @click="createBanner">添加</el-button>
         </div>
     </div>
 </template>
@@ -91,15 +57,20 @@
 
 </style>
 <script>
-import Api from './../../api/index.js'
+// import Api from './../../api/index.js'
 import Vue from 'vue'
-Vue.prototype.$api = Api
-import myUpload from 'vue-image-crop-upload'
+// Vue.prototype.$api = Api
+import Edit from './edit/edit.vue'
+import Create from './create/create.vue'
 export default {
     name: 'Banner',
+    props: ['fileList','imageMax'],
     data() {
         return {
             bannerList: [],
+            bannerTotal: 0, // banner总数
+            limit: 5,
+            skip: 0,
             options: [
                 {value: '1', label: '下架'},
                 {value: '0', label: '上架'}
@@ -111,17 +82,11 @@ export default {
                 status: '',
                 jump: ''
             },
-            id: 'upload',
             show: false,
-			params: {
-				token: '123456798',
-				name: 'avatar'
-			},
-			headers: {
-				smail: '*_~'
-			},
-            region: 'oss-cn-beijing',// 根据你买的那个区的做相应的更改
+            region: 'beijing',// 根据你买的那个区的做相应的更改
             bucket: 'shoemanagement721',
+            id: 'uploadImage',
+            url: '',
         }
     },
     filters: {
@@ -130,90 +95,56 @@ export default {
         }
     },
     components: {
-        'my-upload': myUpload
+        Edit,
+        Create
     },
     methods: {
+        // 获取banner总数
+        getBannerCount() {
+            this.$api.get('banner/countBanner', {}, response => {
+                console.log(response)
+                this.bannerTotal = response.data[0].count
+            })
+        },
+        // 获取banner列表
         getBanner() {
-            this.$api.get('banner/getBanner', {}, response => {
+            this.$api.get('banner/getBanner?limit=' + this.limit + '&skip=' + this.skip, {}, response => {
                 console.log(response)
                 this.bannerList = response.data;
             })
         },
-        deleteRow(index, row) {
-            console.log(index)
-            console.log(row)
-            this.$api.post('banner/insert', {url: 'https://rebo-1256481975.cos.ap-beijing.myqcloud.com/xiaochenxu/banner.png'}, response => {
-                console.log(response)
-            })
-        },
+        // 调起编辑弹框
         edit(index, row) {
-            this.dialogVisible = true;
-            this.form.url = row.url;
-            this.form.jump = row.jump;
+            this.$refs.edit.show(index, row)
         },
-        // 关闭弹框前的回调函数，延缓关闭对话框
-        handleClose(done) {
-            this.$confirm('确认关闭？')
-            .then(_ => {
-                done();
+        // 调起新建弹框
+        createBanner() {
+            this.$refs.create.show()
+        },
+        // 点击页码
+        currentChange(val) {
+            this.skip = this.limit * (val - 1)
+            this.getBanner()
+        },
+        // 上下架操作
+        changeStatus(index, row) {
+            let status = row.status == '1' ? '0' : '1'
+            this.$api.post('banner/edit', {url: row.url, status: status, jump: row.jump, id: row.id}, response => {
+                console.log(response)
+                if (response.data.code == 200) {
+                    this.$message({
+                        message: '修改成功',
+                        type: 'success'
+                    })
+                    this.getBanner()
+                }
             })
-            .catch(_ => {});
-        },
-        onSubmit() {
-            console.log('submit!');
-        },
-        toggleShow() {
-            this.show = !this.show;
-        },
-        change(fileName, fileType, fileSize) {
-            console.log(fileName, fileType, fileSize)
-            // console.log(111)
-            // const _this = this;
-            // const urls = [];
-            // _this.$api.get('/upload/alioss/getOssToken', {}, response => {
-            //     console.log(response)
-            // })
-        },
-        /**
-            * crop success
-            *
-            * [param] imgDataUrl
-            * [param] field
-            */
-        cropSuccess(imgDataUrl, field){
-            this.imgDataUrl = imgDataUrl;
-            console.log(111)
-            // const _this = this;
-            // const urls = [];
-            // _this.$api.get('/upload/alioss/getOssToken', {}, response => {
-            //     console.log(response)
-            // })
-        },
-        /**
-            * upload success
-            *
-            * [param] jsonData   服务器返回数据，已进行json转码
-            * [param] field
-            */
-        cropUploadSuccess(jsonData, field){
-            console.log('-------- upload success --------');
-            console.log(jsonData);
-            console.log('field: ' + field);
-        },
-        /**
-            * upload fail
-            *
-            * [param] status    server api return error status, like 500
-            * [param] field
-            */
-        cropUploadFail(status, field){
-            console.log('-------- upload fail --------');
-            console.log(status);
-            console.log('field: ' + field);
         }
     },
     mounted() {
         this.getBanner();
+        this.getBannerCount();
+        console.log(this.$store.state)
     }
 }
 </script>
