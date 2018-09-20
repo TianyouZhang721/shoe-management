@@ -12,7 +12,7 @@
                 </template>
                 <!-- <span slot="title">分组一</span> -->
                 <el-menu-item index="/banner">滚动广告</el-menu-item>
-                <el-menu-item index="1-2">首页导航</el-menu-item>
+                <el-menu-item index="/class">首页导航</el-menu-item>
                 <el-menu-item index="1-3">底部导航</el-menu-item>
                 <!-- <el-submenu index="1-4">
                     <span slot="title">选项4</span>

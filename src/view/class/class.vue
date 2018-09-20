@@ -44,6 +44,18 @@
         </el-table>
         <!-- 编辑 -->
         <Edit ref="edit" @getList="getClassList"></Edit>
+        <!-- 新建 -->        
+        <Create ref="create" @getList="getClassList"></Create>
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="classTotal"
+            :page-size="limit"
+            @current-change="currentChange">
+        </el-pagination>
+        <div class="bottom">
+            <el-button type="primary" @click="createClass">添加</el-button>
+        </div>
     </div>
 </template>
 <style lang="scss" scoped>
@@ -51,10 +63,12 @@
 </style>
 <script>
 import Edit from './edit/edit.vue'
+import Create from './create/create.vue'
 export default {
     name: 'Class',
     components: {
-        Edit
+        Edit,
+        Create
     },
     data() {
         return {
@@ -83,7 +97,16 @@ export default {
         },
         edit(index, row) {
             this.$refs.edit.show(index, row)
-        }
+        },
+        // 调起新建弹框
+        createClass() {
+            this.$refs.create.show()
+        },
+        // 页码变化
+        currentChange(val) {
+            this.skip = this.limit * (val - 1)
+            this.getBanner()
+        },
     },
     mounted() {
         this.getClassList()
