@@ -112,6 +112,7 @@ export default {
                 console.log(response)
                 this.bannerList = response.data;
             })
+            this.getBannerCount()
         },
         // 调起编辑弹框
         edit(index, row) {
