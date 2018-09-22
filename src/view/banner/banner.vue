@@ -64,7 +64,6 @@ import Edit from './edit/edit.vue'
 import Create from './create/create.vue'
 export default {
     name: 'Banner',
-    props: ['fileList','imageMax'],
     data() {
         return {
             bannerList: [],

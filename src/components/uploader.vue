@@ -1,7 +1,10 @@
 <template lang="html">
   <div class="vue-oss-upload-input" v-bind:style="initSize">
-    <i>+</i>
-    <input type="file" :id="id" @change="upload"/>
+    <i>
+      <span v-if="!url">+</span>
+      <img v-if="url" :src="url"/>
+    </i>
+    <input type="file" :id="id" @change="upload" mutiple/>
   </div>
 </template>
 
@@ -17,6 +20,7 @@
       }
     },
     props: {
+      url,
       debug: {
         type: Boolean,
         default: false
@@ -51,11 +55,11 @@
       }
     },
     created () {
-      console.log(this.keySet)
       this.id = 'upload-input-file' + Math.random()
       this.LoadJS('js_aliyun_oss', 'https://gosspublic.alicdn.com/aliyun-oss-sdk-4.10.0.min.js?time=' + Date.now())
     },
     mounted () {
+      console.log(this.url)      
       let timer = setInterval(() => {
       console.log(this.keySet)
         if (window.OSS) {

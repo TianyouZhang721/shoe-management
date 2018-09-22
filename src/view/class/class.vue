@@ -79,12 +79,14 @@ export default {
         }
     },
     methods: {
+        // 获取总数
         getClassCount() {
             this.$api.get('/first-class/countClass', {}, response => {
                 console.log(response)
                 this.classTotal = response.data[0].count
             })
         },
+        // 获取列表
         getClassList() {
             this.$api.get('first-class/getClass?limit=' + this.limit + '&skip=' + this.skip, {}, response => {
                 console.log(response)
@@ -92,9 +94,21 @@ export default {
             })
             this.getClassCount()
         },
+        // 上下架操作
         changeStatus(index, row) {
-            console.log(row)
+            let status = row.status == '1' ? '0' : '1'
+            this.$api.post('first-class/edit', {url: row.url, status: status, jump: row.jump, id: row.id}, response => {
+                console.log(response)
+                if (response.data.code == 200) {
+                    this.$message({
+                        message: '修改成功',
+                        type: 'success'
+                    })
+                    this.getBanner()
+                }
+            })
         },
+        // 编辑
         edit(index, row) {
             this.$refs.edit.show(index, row)
         },

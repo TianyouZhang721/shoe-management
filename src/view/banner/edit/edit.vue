@@ -6,7 +6,7 @@
         :before-close="handleClose">
         <el-form ref="form" :model="form" label-width="80px">
             <el-form-item label="图片选择">
-                <vueOssUploader :path="path" :debug="true" :name-mode="nameMode" :keySet="keySet" :name="name" v-on:success="uploaded" @error="showError"></vueOssUploader>
+                <vueOssUploader :url="form.url" :path="path" :debug="true" :name-mode="nameMode" :keySet="keySet" :name="name" v-on:success="uploaded" @error="showError"></vueOssUploader>
             </el-form-item>
             <el-form-item label="跳转链接">
                 <el-input v-model="form.jump"></el-input>
@@ -49,6 +49,7 @@ export default {
             this.dialogVisible = true;
             this.form.id = row.id
             this.form.status = row.status
+            this.form.url = row.url
             console.log(index)
             console.log(row)
         },
