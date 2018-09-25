@@ -19,12 +19,12 @@
                     <el-menu-item index="1-4-1">选项1</el-menu-item>
                 </el-submenu> -->
             </el-submenu>
-            <el-submenu index="2">
+            <el-submenu index="shoes">
                 <template slot="title">
                     <i class="el-icon-menu"></i>
                     <span slot="title">商品管理</span>
                 </template>
-                <el-menu-item index="2-1">商品库</el-menu-item>
+                <el-menu-item index="shoes">商品库</el-menu-item>
                 <el-menu-item index="2-2">订单管理</el-menu-item>
             </el-submenu>
             <el-menu-item index="3">

@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Banner from '@/view/banner/banner.vue'
 import Indexnav from '@/view/index-nav/index-nav.vue'
 import Class from '@/view/class/class.vue'
+import Shoes from '@/view/shoes/shoes.vue'
 
 Vue.use(Router)
 
@@ -28,6 +29,11 @@ export default new Router({
       path: '/class',
       name: 'Class',
       component: Class
+    },
+    {
+      path: '/shoes',
+      name: 'Shoe',
+      component: Shoes
     }
   ]
 })

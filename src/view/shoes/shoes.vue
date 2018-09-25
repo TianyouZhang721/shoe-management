@@ -38,8 +38,8 @@
                 width="200">
                 <template slot-scope="scope">
                     <ul>
-                        <li v-for="(item, index) in scope.row.pic" :key="index">
-                            <img style="width: 300px" :src="item" alt="">
+                        <li v-for="(item, index) in scope.row.pic.split(',')" :key="index">
+                            <img style="width: 100px" :src="item" alt="">
                         </li>
                     </ul>
                 </template>
@@ -91,14 +91,33 @@ export default {
             skip: 0,
         }
     },
-    methods = {
+    methods: {
         // 上下架操作
         changeStatus(index, row) {
             console.log(row)
         },
         edit(index, row) {
             console.log(row)
+        },
+        // 获取商品列表
+        getShoes() {
+            this.$api.get('/shoes/shoeList', {}, response => {
+                console.log(response)
+                this.shoeList = response.data
+            })
+            this.getShoesCount()
+        },
+        // 获取商品数量
+        getShoesCount() {
+            this.$api.get('/shoes/count', {}, response => {
+                console.log(response)
+                this.shoeTotal = response.data[0].count;
+                console.log(this.shoeTotal)
+            })
         }
+    },
+    mounted() {
+        this.getShoes()
     }
 }
 </script>
