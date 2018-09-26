@@ -75,14 +75,20 @@
                 </template>
             </el-table-column>
         </el-table>
+        <!-- 新建 -->        
+        <Create ref="create" @getList="getShoesList"></Create>
     </div>
 </template>
 <style lang="scss" scoped>
 
 </style>
 <script>
+import Create from './create/create.vue'
 export default {
     name: 'Shoes',
+    components: {
+        Create
+    },
     data() {
         return {
             shoeList: [],
@@ -96,11 +102,16 @@ export default {
         changeStatus(index, row) {
             console.log(row)
         },
+        // 编辑
         edit(index, row) {
             console.log(row)
         },
+        // 调起新建弹框
+        createClass() {
+            this.$refs.create.show()
+        },
         // 获取商品列表
-        getShoes() {
+        getShoesList() {
             this.$api.get('/shoes/shoeList', {}, response => {
                 console.log(response)
                 this.shoeList = response.data
@@ -117,7 +128,7 @@ export default {
         }
     },
     mounted() {
-        this.getShoes()
+        this.getShoesList()
     }
 }
 </script>
