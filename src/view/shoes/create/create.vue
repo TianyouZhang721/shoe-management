@@ -31,8 +31,17 @@
                     <el-checkbox label="47"></el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
-            <el-form-item label="展示图" v-for="(item, index) in form.pics" :key="index">
+            <el-form-item label="展示图">
                 <vueOssUploader :path="path" :debug="true" :name-mode="nameMode" :keySet="keySet" :name="name" v-on:success="uploaded" @error="showError"></vueOssUploader>
+            </el-form-item>
+            <el-form-item label="详情">
+                <el-input v-model="form.detail"></el-input>
+            </el-form-item>
+            <el-form-item label="所属二级分类">
+                <el-input v-model="form.classificationId"></el-input>
+            </el-form-item>
+            <el-form-item label="购买人数">
+                <el-input v-model="form.buyer"></el-input>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -62,6 +71,9 @@ export default {
                 price: '',
                 size: [],
                 pics: [],
+                detail: '',
+                classificationId: '',
+                buyer: 0,
                 id: '',
                 status: ''
             },
@@ -96,9 +108,9 @@ export default {
             })
             .catch(_ => {});
         },
-        uploaded (filename, index) {
-            console.log(index)
+        uploaded (filename) {
             this.filename = 'https://' + this.keySet.bucket + '.oss-cn-' + this.keySet.region + '.aliyuncs.com/' + filename
+            this.form.pics.push(this.filename)
             // this.form.url = this.filename
         },
         showError (e) {

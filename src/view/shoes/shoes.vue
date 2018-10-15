@@ -77,6 +77,16 @@
         </el-table>
         <!-- 新建 -->        
         <Create ref="create" @getList="getShoesList"></Create>
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="shoeTotal"
+            :page-size="limit"
+            @current-change="currentChange">
+        </el-pagination>
+        <div class="bottom">
+            <el-button type="primary" @click="createShoe">添加</el-button>
+        </div>
     </div>
 </template>
 <style lang="scss" scoped>
@@ -107,8 +117,13 @@ export default {
             console.log(row)
         },
         // 调起新建弹框
-        createClass() {
+        createShoe() {
             this.$refs.create.show()
+        },
+        // 页码变化
+        currentChange(val) {
+            this.skip = this.limit * (val - 1)
+            this.getShoesList()
         },
         // 获取商品列表
         getShoesList() {
